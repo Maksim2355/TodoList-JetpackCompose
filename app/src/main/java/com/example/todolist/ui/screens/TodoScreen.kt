@@ -1,5 +1,6 @@
 package com.example.todolist.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.todolist.data.model.StatusTask
@@ -33,7 +35,6 @@ fun TodoScreen(
     onRemoveTask: (Task) -> Unit,
     onUpdateTask: (Task) -> Unit
 ) {
-    val listTask by tasks.observeAsState(initial = emptyList())
     val editPosition by currentEditPosition.observeAsState(initial = null)
     Scaffold(
         topBar = {
@@ -43,9 +44,8 @@ fun TodoScreen(
             TodoFloatingActionButton()
         }
     ) {
-
         BodyContent(
-            listTask,
+            tasks = tasks,
             editPosition,
             changeCurrentPosition,
             onRemoveTask,
@@ -73,17 +73,18 @@ fun TodoFloatingActionButton(modifier: Modifier = Modifier) {
 
 @Composable
 fun BodyContent(
-    tasks: List<Task>,
+    tasks: LiveData<List<Task>>,
     editPosition: Int?,
     changeCurrentPosition: (Int?) -> Unit,
     onRemoveTask: (Task) -> Unit,
     onUpdateTask: (Task) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val listTask by tasks.observeAsState(initial = emptyList())
     LazyColumn(
         modifier = modifier
     ) {
-        items(tasks) {
+        items(listTask) {
             if (it.id == editPosition) {
                 TodoItemEditing(
                     task = it,
@@ -97,20 +98,19 @@ fun BodyContent(
                 TodoItem(
                     task = it,
                     changeCurrentPosition = changeCurrentPosition,
-                    onRemoveTask = onRemoveTask,
-                    modifier = Modifier.padding(8.dp).fillMaxWidth()
+                    modifier = Modifier.padding(8.dp).fillParentMaxWidth()
                 )
 
             }
         }
     }
+
 }
 
 @Composable
 fun TodoItem(
     task: Task,
     changeCurrentPosition: (Int?) -> Unit,
-    onRemoveTask: (Task) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -120,10 +120,13 @@ fun TodoItem(
         Row(
             modifier = modifier.padding(12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = task.name, fontWeight = FontWeight.Bold)
-            Icon(imageVector = task.status.imageVector)
+            Text(
+                text = task.name,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(6f)
+            )
+            Icon(imageVector = task.status.imageVector, modifier = Modifier.weight(1f))
         }
     }
 }
@@ -146,21 +149,43 @@ fun TodoItemEditing(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = task.name, fontWeight = FontWeight.Bold)
-                IconButton(onClick = { onRemoveTask(task) }) {
+                Text(text = task.name, fontWeight = FontWeight.Bold, modifier = Modifier.weight(4f))
+                IconButton(onClick = { onRemoveTask(task) }, modifier = Modifier.weight(1f)) {
                     Icon(imageVector = Icons.Filled.Delete)
                 }
             }
-            Row(modifier = Modifier.padding(4.dp)) {
-                Icon(imageVector = StatusTask.InQueue.imageVector)
-                Icon(imageVector = StatusTask.InProgress.imageVector)
-                Icon(imageVector = StatusTask.Completed.imageVector)
-            }
+            TaskStatusRadioGroup(
+                currentStatus = task.status,
+                onChangeStatus = { updatedStatus ->
+                    task.status = updatedStatus
+                    onUpdateTask(task)
+                })
             Text(text = task.description)
         }
 
     }
+}
 
+@Composable
+fun TaskStatusRadioGroup(
+    currentStatus: StatusTask,
+    onChangeStatus: (StatusTask) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = Modifier
+    ) {
+        for (status in StatusTask.values()) {
+            val backgroundTask = if (currentStatus == status) Color.LightGray else Color.White
+            IconButton(
+                onClick = { onChangeStatus(status) },
+                modifier = Modifier.padding(2.dp)
+                    .background(backgroundTask, shape = MaterialTheme.shapes.small)
+            ) {
+                Icon(imageVector = status.imageVector)
+            }
+        }
+    }
 }
 
 @Preview
