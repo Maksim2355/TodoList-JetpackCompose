@@ -8,7 +8,7 @@ import com.example.todolist.data.model.Task
 
 class MockRepository : TaskRepository {
 
-    private val _listTask: MutableList<Task> = mutableListOf(
+    private var _listTask: List<Task> = listOf(
         Task(
             generateId(),
             "Приготовить питсу",
@@ -52,23 +52,27 @@ class MockRepository : TaskRepository {
     override val observedTask: LiveData<List<Task>>
         get() = _taskStreams
 
-    override fun updateTask(task: Task) {
-        val taskNoEdit = _listTask.find { it.id == taskId }
-        val indexElement = _listTask.indexOf(taskNoEdit)
-        if (indexElement != -1) _listTask[indexElement] = task
-        println("Обновляем")
-        _taskStreams.postValue(_listTask)
+    override fun addNewTask(task: Task) {
+        val tmpList = _listTask.toMutableList()
+        tmpList.add(task)
+        _listTask = tmpList
+        _taskStreams.postValue(tmpList)
     }
 
-    override fun addNewTask(task: Task) {
-        _listTask.add(task)
-        _taskStreams.postValue(_listTask)
+    override fun updateTask(task: Task) {
+        val tmpList = _listTask.toMutableList()
+        val taskNoEdit = tmpList.find { it.id == task.id }
+        val indexElement = tmpList.indexOf(taskNoEdit)
+        if (indexElement != -1) tmpList[indexElement] = task
+        _listTask = tmpList
+        _taskStreams.postValue(tmpList)
     }
 
     override fun removeTask(task: Task) {
-        _listTask.remove(task)
-        println("Удаляем")
-        _taskStreams.postValue(_listTask)
+        val tmpList = _listTask.toMutableList()
+        tmpList.remove(task)
+        _listTask = tmpList
+        _taskStreams.postValue(tmpList)
     }
 
     companion object {

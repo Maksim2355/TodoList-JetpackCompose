@@ -24,9 +24,8 @@ class MainActivity : AppCompatActivity() {
         ).get(TodoListViewModel::class.java)
         setContent {
             App {
-                val tasks by todoViewModel.taskList.observeAsState(initial = emptyList())
                 TodoScreen(
-                    tasks,
+                    todoViewModel.taskList,
                     todoViewModel::addNewTask,
                     todoViewModel::removeTask,
                     todoViewModel::updateTask

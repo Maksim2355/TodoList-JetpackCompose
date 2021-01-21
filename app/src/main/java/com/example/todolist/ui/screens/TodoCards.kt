@@ -19,6 +19,7 @@ import com.example.todolist.data.model.StatusTask
 import com.example.todolist.data.model.Task
 
 
+
 @Composable
 fun TodoItem(
     task: Task,
@@ -54,9 +55,6 @@ fun TodoItemEditing(
     onRemoveTask: (Task) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val currentStatusTask: MutableState<StatusTask> = remember {
-        mutableStateOf(task.status)
-    }
     Card(
         modifier = modifier.clickable(onClick = { changeCurrentPosition(null) }),
         elevation = 2.dp
@@ -80,9 +78,8 @@ fun TodoItemEditing(
                 }
             }
             TaskStatusRadioGroup(
-                currentStatus = currentStatusTask.value,
+                currentStatus = task.status,
                 onChangeStatus = { updatedStatus ->
-                    currentStatusTask.value = updatedStatus
                     val updatedTask = task.copy(status = updatedStatus)
                     onUpdateTask(updatedTask)
                 })
@@ -112,3 +109,4 @@ fun TaskStatusRadioGroup(
         }
     }
 }
+

@@ -5,10 +5,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -16,16 +14,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.example.todolist.data.model.Task
 
 
 @Composable
 fun TodoScreen(
-    tasks: List<Task>,
+    tasks: LiveData<List<Task>>,
     onAddTask: (Task) -> Unit,
     onRemoveTask: (Task) -> Unit,
     onUpdateTask: (Task) -> Unit
 ) {
+    val taskList by tasks.observeAsState(initial = emptyList())
+    println(taskList)
     Scaffold(
         topBar = {
             TodoAppBar()
@@ -35,7 +37,7 @@ fun TodoScreen(
         }
     ) {
         BodyContent(
-            tasks,
+            taskList,
             onRemoveTask,
             onUpdateTask,
         )
@@ -65,6 +67,8 @@ fun BodyContent(
     onRemoveTask: (Task) -> Unit,
     onUpdateTask: (Task) -> Unit,
 ) {
+    println(tasks.size)
+    println(tasks)
     if (tasks.isEmpty()) {
         NoDataFeed("No data", modifier = Modifier)
     } else {
@@ -127,5 +131,5 @@ fun TaskFeed(
 @Composable
 fun PreviewTodoScreen() {
     TodoScreen(
-        emptyList(), {}, {}, {})
+        MutableLiveData(emptyList()), {}, {}, {})
 }
