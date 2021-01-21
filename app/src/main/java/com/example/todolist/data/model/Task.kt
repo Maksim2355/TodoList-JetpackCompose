@@ -5,9 +5,9 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.graphics.vector.ImageVector
 
 data class Task(val id: Int,
-                var name: String,
-                var description: String,
-                var status: StatusTask)
+                val name: String,
+                val description: String,
+                val status: StatusTask)
 
 enum class StatusTask(val imageVector: ImageVector) {
     InQueue(Icons.Filled.PendingActions),

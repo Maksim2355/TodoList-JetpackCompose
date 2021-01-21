@@ -5,7 +5,7 @@ import com.example.todolist.data.model.Task
 
 interface TaskRepository {
 
-    fun observeTask(): LiveData<List<Task>>
+    val observedTask: LiveData<List<Task>>
 
     fun updateTask(task: Task)
 

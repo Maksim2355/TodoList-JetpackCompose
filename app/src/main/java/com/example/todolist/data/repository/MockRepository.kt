@@ -49,12 +49,14 @@ class MockRepository : TaskRepository {
 
     private val _taskStreams: MutableLiveData<List<Task>> = MutableLiveData(_listTask)
 
-    override fun observeTask(): LiveData<List<Task>> = _taskStreams
+    override val observedTask: LiveData<List<Task>>
+        get() = _taskStreams
 
     override fun updateTask(task: Task) {
         val taskNoEdit = _listTask.find { it.id == taskId }
         val indexElement = _listTask.indexOf(taskNoEdit)
         if (indexElement != -1) _listTask[indexElement] = task
+        println("Обновляем")
         _taskStreams.postValue(_listTask)
     }
 
@@ -65,6 +67,7 @@ class MockRepository : TaskRepository {
 
     override fun removeTask(task: Task) {
         _listTask.remove(task)
+        println("Удаляем")
         _taskStreams.postValue(_listTask)
     }
 

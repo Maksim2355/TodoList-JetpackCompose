@@ -3,6 +3,8 @@ package com.example.todolist
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.platform.setContent
 import androidx.lifecycle.ViewModelProvider
 import com.example.todolist.data.repository.MockRepository
@@ -22,10 +24,9 @@ class MainActivity : AppCompatActivity() {
         ).get(TodoListViewModel::class.java)
         setContent {
             App {
+                val tasks by todoViewModel.taskList.observeAsState(initial = emptyList())
                 TodoScreen(
-                    todoViewModel.taskList,
-                    todoViewModel.currentEditPosition,
-                    todoViewModel::changeCurrentPosition,
+                    tasks,
                     todoViewModel::addNewTask,
                     todoViewModel::removeTask,
                     todoViewModel::updateTask
