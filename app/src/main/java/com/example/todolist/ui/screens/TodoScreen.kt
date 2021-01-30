@@ -21,28 +21,33 @@ import com.example.todolist.data.model.Task
 
 @Composable
 fun TodoScreen(
-    tasks: LiveData<List<Task>>,
+    tasks: List<Task>,
     onAddTask: (Task) -> Unit,
     onRemoveTask: (Task) -> Unit,
     onUpdateTask: (Task) -> Unit
 ) {
-    val taskList by tasks.observeAsState(initial = emptyList())
-    println(taskList)
+    val isShowDialog = remember {
+        mutableStateOf(false)
+    }
     Scaffold(
         topBar = {
             TodoAppBar()
         },
         floatingActionButton = {
-            TodoFloatingActionButton()
+            TodoFloatingActionButton(onShowDialog = { isShowDialog.value = true })
         }
     ) {
         BodyContent(
-            taskList,
+            tasks,
             onRemoveTask,
             onUpdateTask,
         )
+        if (isShowDialog.value) {
+            AddTaskDialog(onAddTask, {isShowDialog.value = false})
+        }
     }
 }
+
 
 @Composable
 fun TodoAppBar(modifier: Modifier = Modifier) {
@@ -50,9 +55,9 @@ fun TodoAppBar(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun TodoFloatingActionButton(modifier: Modifier = Modifier) {
+fun TodoFloatingActionButton(onShowDialog: () -> Unit, modifier: Modifier = Modifier) {
     FloatingActionButton(
-        onClick = { },
+        onClick = { onShowDialog() },
         backgroundColor = Color.Blue,
         contentColor = Color.White,
         modifier = modifier
@@ -67,8 +72,6 @@ fun BodyContent(
     onRemoveTask: (Task) -> Unit,
     onUpdateTask: (Task) -> Unit,
 ) {
-    println(tasks.size)
-    println(tasks)
     if (tasks.isEmpty()) {
         NoDataFeed("No data", modifier = Modifier)
     } else {
@@ -130,6 +133,5 @@ fun TaskFeed(
 @Preview
 @Composable
 fun PreviewTodoScreen() {
-    TodoScreen(
-        MutableLiveData(emptyList()), {}, {}, {})
+    TodoScreen(emptyList(), {}, {}, {})
 }
