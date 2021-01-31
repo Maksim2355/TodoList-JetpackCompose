@@ -7,7 +7,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.platform.setContent
 import androidx.lifecycle.ViewModelProvider
-import com.example.todolist.data.repository.MockRepository
 import com.example.todolist.data.repository.TaskRepositoryImpl
 import com.example.todolist.ui.TodoListTheme
 import com.example.todolist.ui.screens.TodoScreen
@@ -26,6 +25,7 @@ class MainActivity : AppCompatActivity() {
         setContent {
             App {
                 val taskList by todoViewModel.taskList.observeAsState(initial = emptyList())
+                println(taskList)
                 TodoScreen(
                     taskList,
                     todoViewModel::addNewTask,

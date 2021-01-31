@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.gesture.longPressGestureFilter
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -19,15 +20,18 @@ import com.example.todolist.data.model.StatusTask
 import com.example.todolist.data.model.Task
 
 
-
 @Composable
 fun TodoItem(
     task: Task,
     changeCurrentPosition: (Int?) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onLongPressed: (Task) -> Unit = {}
 ) {
     Card(
-        modifier = modifier.clickable(onClick = { changeCurrentPosition(task.id) }),
+        modifier = modifier.clickable(onClick = { changeCurrentPosition(task.id) })
+            .longPressGestureFilter {
+                onLongPressed(task)
+            },
         elevation = 2.dp
     ) {
         Row(
@@ -53,10 +57,12 @@ fun TodoItemEditing(
     changeCurrentPosition: (Int?) -> Unit,
     onUpdateTask: (Task) -> Unit,
     onRemoveTask: (Task) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onLongPressed: (Task) -> Unit = {}
 ) {
     Card(
-        modifier = modifier.clickable(onClick = { changeCurrentPosition(null) }),
+        modifier = modifier.clickable(onClick = { changeCurrentPosition(null) })
+            .longPressGestureFilter { onLongPressed(task) },
         elevation = 2.dp
     ) {
         Column(modifier = Modifier.padding(12.dp)) {

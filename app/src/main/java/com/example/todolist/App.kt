@@ -6,7 +6,6 @@ import com.example.todolist.data.db.TaskDbOpenHelper
 
 class App: Application() {
 
-
     override fun onCreate() {
         super.onCreate()
         instance = this
@@ -14,6 +13,7 @@ class App: Application() {
     }
 
     companion object {
+        //Нормальные люди не используют тут lateinit
         private lateinit var instance: App
         lateinit var dao: TaskDao
     }

@@ -6,7 +6,6 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -14,8 +13,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.example.todolist.data.model.Task
 
 
@@ -26,24 +23,44 @@ fun TodoScreen(
     onRemoveTask: (Task) -> Unit,
     onUpdateTask: (Task) -> Unit
 ) {
-    val isShowDialog = remember {
+    val isShowAddTaskDialog = remember {
         mutableStateOf(false)
+    }
+    val isShowEditDialog = remember {
+        mutableStateOf(false)
+    }
+    val taskByDefault: MutableState<Task?> = remember {
+        mutableStateOf(null)
     }
     Scaffold(
         topBar = {
             TodoAppBar()
         },
         floatingActionButton = {
-            TodoFloatingActionButton(onShowDialog = { isShowDialog.value = true })
+            TodoFloatingActionButton(onShowDialog = { isShowAddTaskDialog.value = true })
         }
     ) {
         BodyContent(
             tasks,
             onRemoveTask,
             onUpdateTask,
+            onOpenEditDialog = {
+                taskByDefault.value = it
+                isShowEditDialog.value = true
+            }
         )
-        if (isShowDialog.value) {
-            AddTaskDialog(onAddTask, {isShowDialog.value = false})
+        if (isShowAddTaskDialog.value) {
+            ChangeTaskDialog(onAddTask, { isShowAddTaskDialog.value = false })
+        }
+        if (isShowEditDialog.value) {
+            ChangeTaskDialog(
+                onUpdateTask,
+                {
+                    isShowEditDialog.value = false
+                    taskByDefault.value = null
+                },
+                taskByDefault = taskByDefault.value
+            )
         }
     }
 }
@@ -71,11 +88,12 @@ fun BodyContent(
     tasks: List<Task>,
     onRemoveTask: (Task) -> Unit,
     onUpdateTask: (Task) -> Unit,
+    onOpenEditDialog: (Task) -> Unit = {}
 ) {
     if (tasks.isEmpty()) {
         NoDataFeed("No data", modifier = Modifier)
     } else {
-        TaskFeed(tasks, onUpdateTask, onRemoveTask)
+        TaskFeed(tasks, onUpdateTask, onRemoveTask, onOpenEditDialog = onOpenEditDialog)
     }
 }
 
@@ -85,14 +103,15 @@ fun NoDataFeed(message: String, modifier: Modifier = Modifier) {
         contentAlignment = Alignment.Center,
         modifier = modifier.fillMaxSize()
     ) {
-        Column {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Text(
                 message,
-                fontSize = TextUnit.Companion.Sp(48),
-                modifier = Modifier.padding(vertical = 4.dp),
+                fontSize = TextUnit.Companion.Sp(24),
+                modifier = Modifier.padding(vertical = 6.dp),
                 fontWeight = FontWeight.Bold
             )
-            CircularProgressIndicator(modifier = Modifier.padding(8.dp))
         }
     }
 }
@@ -102,7 +121,8 @@ fun TaskFeed(
     tasks: List<Task>,
     onUpdateTask: (Task) -> Unit,
     onRemoveTask: (Task) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onOpenEditDialog: (Task) -> Unit = {}
 ) {
     val currentPosition: MutableState<Int?> = remember { mutableStateOf(null) }
     LazyColumn(
@@ -115,13 +135,15 @@ fun TaskFeed(
                     changeCurrentPosition = { currentPosition.value = null },
                     onUpdateTask = onUpdateTask,
                     onRemoveTask = onRemoveTask,
-                    modifier = Modifier.padding(8.dp).fillMaxWidth()
+                    modifier = Modifier.padding(8.dp).fillMaxWidth(),
+                    onLongPressed = onOpenEditDialog
                 )
             } else {
                 TodoItem(
                     task = task,
                     changeCurrentPosition = { currentPosition.value = task.id },
-                    modifier = Modifier.padding(8.dp).fillMaxWidth()
+                    modifier = Modifier.padding(8.dp).fillMaxWidth(),
+                    onLongPressed = onOpenEditDialog
                 )
 
             }

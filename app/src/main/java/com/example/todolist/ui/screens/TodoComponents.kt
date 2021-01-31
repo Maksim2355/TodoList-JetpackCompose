@@ -13,22 +13,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.todolist.data.model.Task
-import com.example.todolist.data.repository.MockRepository
-import java.util.*
 
 @Composable
-fun AddTaskDialog(
-    onAddTask: (Task) -> Unit,
+fun ChangeTaskDialog(
+    onChangeTask: (Task) -> Unit,
     onDismissDialog: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    taskByDefault: Task? = null
 ) {
     val taskName = remember {
-        mutableStateOf("")
+        mutableStateOf(taskByDefault?.name ?: "")
     }
     val taskDescription = remember {
-        mutableStateOf("")
+        mutableStateOf(taskByDefault?.description ?: "")
     }
-    Dialog(onDismissRequest = { onDismissDialog() }) {
+    Dialog(onDismissRequest = { }) {
         Card() {
             Column(
                 verticalArrangement = Arrangement.Center,
@@ -54,22 +53,25 @@ fun AddTaskDialog(
                     Button(
                         onClick = {
                             onDismissDialog()
-                            val task = Task(
-                                MockRepository.generateId(),
+                            val task = taskByDefault?.copy(
+                                name = taskName.value,
+                                description = taskDescription.value
+                            ) ?: Task(
+                                0,
                                 taskName.value,
                                 taskDescription.value
                             )
-                            onAddTask(task)
+                            onChangeTask(task)
                         },
                         modifier = Modifier.padding(8.dp),
                     ) {
-                        Text(text = "Добавить")
+                        Text(text = "Отправить")
                     }
                     Button(
                         onClick = { onDismissDialog() },
                         modifier = Modifier.padding(8.dp),
                     ) {
-                        Text(text = "Удалить")
+                        Text(text = "Отменить")
                     }
                 }
             }

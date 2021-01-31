@@ -15,6 +15,7 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
     override fun updateTask(task: Task) {
         taskDao.updateTask(task)
         _taskStreams.postValue(taskDao.getAllTask())
+        println("Измененно отвечаю")
     }
 
     override fun addNewTask(task: Task) {
