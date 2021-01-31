@@ -8,6 +8,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.platform.setContent
 import androidx.lifecycle.ViewModelProvider
 import com.example.todolist.data.repository.MockRepository
+import com.example.todolist.data.repository.TaskRepositoryImpl
 import com.example.todolist.ui.TodoListTheme
 import com.example.todolist.ui.screens.TodoScreen
 import com.example.todolist.vm.TodoListViewModel
@@ -20,7 +21,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val todoViewModel = ViewModelProvider(
             this,
-            TodoViewModelFactory(MockRepository())
+            TodoViewModelFactory(TaskRepositoryImpl(App.dao))
         ).get(TodoListViewModel::class.java)
         setContent {
             App {
