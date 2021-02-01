@@ -44,6 +44,7 @@ fun TextFieldWithTitle(
     title: String = "",
     maxLines: Int = Int.MAX_VALUE,
     backgroundColor: Color = MaterialTheme.colors.background,
+    isErrorValue: Boolean = false
 ) {
     if (title.isNotEmpty()) {
         Text(title, style = MaterialTheme.typography.body1)
@@ -53,7 +54,8 @@ fun TextFieldWithTitle(
         onValueChange = onValueChange,
         modifier = modifier,
         maxLines = maxLines,
-        backgroundColor = backgroundColor
+        backgroundColor = backgroundColor,
+        isErrorValue = isErrorValue
     )
 }
 

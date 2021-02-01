@@ -1,10 +1,7 @@
 package com.example.todolist.ui.screens
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -49,8 +46,6 @@ fun TodoItemDetails(
     val isEditingMode = remember {
         mutableStateOf(false)
     }
-    val title = remember { mutableStateOf(task.name) }
-    val description = remember { mutableStateOf(task.description) }
     TodoCard(
         onClick = {
             if (isEditingMode.value) isEditingMode.value = false
@@ -60,47 +55,88 @@ fun TodoItemDetails(
         modifier = modifier
     ) {
         if (isEditingMode.value) {
-            TextFieldWithTitle(
-                value = title.value,
-                onValueChange = {
-                    title.value = it
-                    val editTask = task.copy(name = it)
-                    onUpdateTask(editTask)
-                },
-                modifier = Modifier.padding(6.dp)
-            )
-            TextFieldWithTitle(
-                value = description.value,
-                onValueChange = {
-                    description.value = it
-                    val editTask = task.copy(description = it)
-                    onUpdateTask(editTask)
-                },
-                modifier = Modifier.padding(6.dp)
+            TodoItemEditor(
+                todoTitle = task.name,
+                todoDescription = task.description,
+                onTitleChanged = { onUpdateTask(task.copy(name = it)) },
+                onDescriptionChanged = { onUpdateTask(task.copy(description = it)) },
+                modifier = Modifier.fillMaxWidth()
             )
         } else {
-            TodoRow(
+            TodoDetails(
                 title = task.name,
+                description = task.description,
                 icon = Icons.Default.Delete,
-                onIconClick = { onRemoveTask(task) }
-            )
-            Text(text = task.description)
+                onIconClick = { onRemoveTask(task) })
         }
         TaskStatusRadioGroup(
             currentStatus = task.status,
             onChangeStatus = { updatedStatus ->
                 val updatedTask = task.copy(status = updatedStatus)
                 onUpdateTask(updatedTask)
-            },
+            }
         )
     }
 }
 
 @Composable
-fun TodoItemEditor() {
-    TodoCard() {
+fun TodoItemEditor(
+    todoTitle: String,
+    todoDescription: String,
+    onTitleChanged: (String) -> Unit,
+    onDescriptionChanged: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val title = remember { mutableStateOf(todoTitle) }
+    val description = remember { mutableStateOf(todoDescription) }
+    val isErrorTextFieldTitle = remember { mutableStateOf(false) }
+    val isErrorTextFieldDescription = remember { mutableStateOf(false) }
+    // Вот если такой код повторяется, значит ты дебил. Не повторяй моих ошибок. Мне лень
+    TextFieldWithTitle(
+        value = title.value,
+        onValueChange = {
+            title.value = it
+            if (it.length < 4){
+                isErrorTextFieldTitle.value = false
+                onTitleChanged(it)
+            }else {
+                isErrorTextFieldTitle.value = true
+            }
+        },
+        isErrorValue = isErrorTextFieldTitle.value,
+        modifier = modifier.padding(6.dp)
+    )
+    TextFieldWithTitle(
+        value = description.value,
+        onValueChange = {
+            description.value = it
+            if (it.length < 12){
+                isErrorTextFieldDescription.value = false
+                onDescriptionChanged(it)
+            }else {
+                isErrorTextFieldDescription.value = true
+            }
+        },
+        isErrorValue = isErrorTextFieldDescription.value,
+        modifier = modifier.padding(6.dp)
+    )
+}
 
-    }
+@Composable
+fun TodoDetails(
+    title: String,
+    description: String,
+    icon: ImageVector,
+    onIconClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    TodoRow(
+        title = title,
+        icon = icon,
+        onIconClick = { onIconClick() },
+        modifier = modifier
+    )
+    Text(text = description)
 }
 
 @Composable
@@ -152,10 +188,10 @@ fun TaskStatusRadioGroup(
     currentStatus: StatusTask,
     onChangeStatus: (StatusTask) -> Unit,
     modifier: Modifier = Modifier,
-    alignment: Alignment = Alignment.Center
 ) {
     Row(
-        modifier = modifier
+        modifier = modifier,
+        horizontalArrangement = Arrangement.Center
     ) {
         for (status in StatusTask.values()) {
             val iconTint = if (currentStatus == status) Color.Blue else Color.Black
