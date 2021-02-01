@@ -26,16 +26,8 @@ fun TodoScreen(
     val isShowAddTaskDialog = remember {
         mutableStateOf(false)
     }
-    val isShowEditDialog = remember {
-        mutableStateOf(false)
-    }
-    val taskByDefault: MutableState<Task?> = remember {
-        mutableStateOf(null)
-    }
     Scaffold(
-        topBar = {
-            TodoAppBar()
-        },
+        topBar = { TodoAppBar() },
         floatingActionButton = {
             TodoFloatingActionButton(onShowDialog = { isShowAddTaskDialog.value = true })
         }
@@ -44,23 +36,11 @@ fun TodoScreen(
             tasks,
             onRemoveTask,
             onUpdateTask,
-            onOpenEditDialog = {
-                taskByDefault.value = it
-                isShowEditDialog.value = true
-            }
         )
         if (isShowAddTaskDialog.value) {
-            ChangeTaskDialog(onAddTask, { isShowAddTaskDialog.value = false })
-        }
-        if (isShowEditDialog.value) {
             ChangeTaskDialog(
-                onUpdateTask,
-                {
-                    isShowEditDialog.value = false
-                    taskByDefault.value = null
-                },
-                taskByDefault = taskByDefault.value
-            )
+                onChangeTask = onAddTask,
+                onDismissDialog = { isShowAddTaskDialog.value = false })
         }
     }
 }
@@ -88,17 +68,19 @@ fun BodyContent(
     tasks: List<Task>,
     onRemoveTask: (Task) -> Unit,
     onUpdateTask: (Task) -> Unit,
-    onOpenEditDialog: (Task) -> Unit = {}
 ) {
     if (tasks.isEmpty()) {
-        NoDataFeed("No data", modifier = Modifier)
+        NoDataMessage(
+            "No data",
+            modifier = Modifier
+        )
     } else {
-        TaskFeed(tasks, onUpdateTask, onRemoveTask, onOpenEditDialog = onOpenEditDialog)
+        TaskFeed(tasks, onUpdateTask, onRemoveTask)
     }
 }
 
 @Composable
-fun NoDataFeed(message: String, modifier: Modifier = Modifier) {
+fun NoDataMessage(message: String, modifier: Modifier = Modifier) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier.fillMaxSize()
@@ -122,7 +104,6 @@ fun TaskFeed(
     onUpdateTask: (Task) -> Unit,
     onRemoveTask: (Task) -> Unit,
     modifier: Modifier = Modifier,
-    onOpenEditDialog: (Task) -> Unit = {}
 ) {
     val currentPosition: MutableState<Int?> = remember { mutableStateOf(null) }
     LazyColumn(
@@ -130,22 +111,19 @@ fun TaskFeed(
     ) {
         items(tasks) { task ->
             if (task.id == currentPosition.value) {
-                TodoItemEditing(
+                TodoItemDetails(
                     task = task,
                     changeCurrentPosition = { currentPosition.value = null },
                     onUpdateTask = onUpdateTask,
                     onRemoveTask = onRemoveTask,
                     modifier = Modifier.padding(8.dp).fillMaxWidth(),
-                    onLongPressed = onOpenEditDialog
                 )
             } else {
                 TodoItem(
                     task = task,
                     changeCurrentPosition = { currentPosition.value = task.id },
                     modifier = Modifier.padding(8.dp).fillMaxWidth(),
-                    onLongPressed = onOpenEditDialog
                 )
-
             }
         }
     }

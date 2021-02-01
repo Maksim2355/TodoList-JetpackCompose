@@ -25,7 +25,6 @@ class MainActivity : AppCompatActivity() {
         setContent {
             App {
                 val taskList by todoViewModel.taskList.observeAsState(initial = emptyList())
-                println(taskList)
                 TodoScreen(
                     taskList,
                     todoViewModel::addNewTask,
