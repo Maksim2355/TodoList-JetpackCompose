@@ -87,38 +87,18 @@ fun TodoItemEditor(
     onDescriptionChanged: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val title = remember { mutableStateOf(todoTitle) }
-    val description = remember { mutableStateOf(todoDescription) }
-    val isErrorTextFieldTitle = remember { mutableStateOf(false) }
-    val isErrorTextFieldDescription = remember { mutableStateOf(false) }
-    // Вот если такой код повторяется, значит ты дебил. Не повторяй моих ошибок. Мне лень
+    val validator: (String) -> Boolean = { it.length > 4 }
     TextFieldWithTitle(
-        value = title.value,
-        onValueChange = {
-            title.value = it
-            if (it.length < 4){
-                isErrorTextFieldTitle.value = false
-                onTitleChanged(it)
-            }else {
-                isErrorTextFieldTitle.value = true
-            }
-        },
-        isErrorValue = isErrorTextFieldTitle.value,
-        modifier = modifier.padding(6.dp)
+        initValue = todoTitle,
+        onValueChange = { onTitleChanged(it) },
+        modifier = modifier.padding(6.dp),
+        validator = validator
     )
     TextFieldWithTitle(
-        value = description.value,
-        onValueChange = {
-            description.value = it
-            if (it.length < 12){
-                isErrorTextFieldDescription.value = false
-                onDescriptionChanged(it)
-            }else {
-                isErrorTextFieldDescription.value = true
-            }
-        },
-        isErrorValue = isErrorTextFieldDescription.value,
-        modifier = modifier.padding(6.dp)
+        initValue = todoDescription,
+        onValueChange = { onDescriptionChanged(it) },
+        modifier = modifier.padding(6.dp),
+        validator = validator,
     )
 }
 

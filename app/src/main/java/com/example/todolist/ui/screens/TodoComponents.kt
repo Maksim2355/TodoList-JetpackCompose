@@ -38,24 +38,34 @@ fun ChangeTaskDialog(
 
 @Composable
 fun TextFieldWithTitle(
-    value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
+    initValue: String = "",
     title: String = "",
     maxLines: Int = Int.MAX_VALUE,
     backgroundColor: Color = MaterialTheme.colors.background,
-    isErrorValue: Boolean = false
+    validator: (String) -> Boolean = { true }
 ) {
+    val isErrorValue = remember { mutableStateOf(true) }
+    val valueTextField = remember { mutableStateOf(initValue) }
     if (title.isNotEmpty()) {
         Text(title, style = MaterialTheme.typography.body1)
     }
     TextField(
-        value = value,
-        onValueChange = onValueChange,
+        value = valueTextField.value,
+        onValueChange = {
+            valueTextField.value = it
+            if (validator(it)) {
+                onValueChange(it)
+                isErrorValue.value = true
+            } else {
+                isErrorValue.value = false
+            }
+        },
         modifier = modifier,
         maxLines = maxLines,
         backgroundColor = backgroundColor,
-        isErrorValue = isErrorValue
+        isErrorValue = isErrorValue.value
     )
 }
 
@@ -100,24 +110,24 @@ fun CardDialog(
 }
 
 @Composable
-fun FormWithTwoTextFields(onSubmit: (String, String) -> Unit, onCancel: () -> Unit) {
-    val title = remember {
-        mutableStateOf("")
-    }
-    val description = remember {
-        mutableStateOf("")
-    }
+fun FormWithTwoTextFields(
+    onSubmit: (String, String) -> Unit, onCancel: () -> Unit,
+    titleTextField1: String = "", titleTextField2: String = ""
+) {
+    val title = remember { mutableStateOf("") }
+    val description = remember { mutableStateOf("") }
+    val validator: (String) -> Boolean = { it.length > 4 }
     TextFieldWithTitle(
-        value = title.value,
         onValueChange = { title.value = it },
-        title = "Название задачи",
-        modifier = Modifier.padding(8.dp)
+        title = titleTextField1,
+        modifier = Modifier.padding(8.dp),
+        validator = validator
     )
     TextFieldWithTitle(
-        value = description.value,
         onValueChange = { description.value = it },
-        title = "Описание задачи",
-        modifier = Modifier.padding(8.dp)
+        title = titleTextField2,
+        modifier = Modifier.padding(8.dp),
+        validator = validator
     )
     FormControlButtons(
         onSubmit = { onSubmit(title.value, description.value) },
