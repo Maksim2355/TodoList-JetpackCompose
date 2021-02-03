@@ -3,9 +3,11 @@ package com.example.todolist.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -13,6 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -50,7 +54,6 @@ fun TodoScreen(
             )
         }
     }
-
 }
 
 
@@ -65,22 +68,36 @@ fun SearchAppBar(onQueryChange: (String) -> Unit, modifier: Modifier = Modifier)
             color = MaterialTheme.colors.primary,
             elevation = 8.dp
         ) {
+            val onValueChange: (String) -> Unit = {
+                query.value = it
+                onQueryChange(it)
+            }
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 TextField(
                     value = query.value,
-                    onValueChange = {
-                        query.value = it
-                        println("Сработало")
-                        onQueryChange(it)
-                    },
+                    onValueChange = onValueChange,
                     label = {
                         Text("Search")
                     },
                     leadingIcon = {
                         Icon(Icons.Default.Search, null)
+                    },
+                    trailingIcon = {
+                        IconButton(onClick = { onValueChange("") }) {
+                            Icon(Icons.Default.Clear, null)
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Done,
+                    ),
+                    onImeActionPerformed = { imeAction, softwareKeyboardController ->
+                        if (imeAction == ImeAction.Done) {
+                            softwareKeyboardController?.hideSoftwareKeyboard()
+                        }
                     },
                     textStyle = TextStyle(color = MaterialTheme.colors.onSurface),
                     backgroundColor = MaterialTheme.colors.surface,
@@ -160,13 +177,13 @@ fun TaskFeed(
                     changeCurrentPosition = { currentPosition.value = null },
                     onUpdateTask = onUpdateTask,
                     onRemoveTask = onRemoveTask,
-                    modifier = Modifier.padding(8.dp).fillMaxWidth(),
+                    modifier = Modifier.padding(16.dp).fillMaxWidth(),
                 )
             } else {
                 TodoItem(
                     task = task,
                     changeCurrentPosition = { currentPosition.value = task.id },
-                    modifier = Modifier.padding(8.dp).fillMaxWidth(),
+                    modifier = Modifier.padding(16.dp).fillMaxWidth(),
                 )
             }
         }
