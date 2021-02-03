@@ -35,7 +35,8 @@ class MainActivity : AppCompatActivity() {
                     todoViewModel::addNewTask,
                     todoViewModel::removeTask,
                     todoViewModel::updateTask,
-                    todoViewModel::filterTaskByQuery
+                    todoViewModel::filterTaskByQuery,
+                    todoViewModel::sortedTaskByParams
                 )
             }
         }

@@ -20,6 +20,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import com.example.todolist.common.FilterParams
 import com.example.todolist.data.model.Task
 
 
@@ -29,14 +30,15 @@ fun TodoScreen(
     onAddTask: (Task) -> Unit,
     onRemoveTask: (Task) -> Unit,
     onUpdateTask: (Task) -> Unit,
-    filterTaskByQuery: (String) -> Unit
+    filterTaskByQuery: (String) -> Unit,
+    sortedTaskByParams: (FilterParams) -> Unit
 ) {
     val isShowAddTaskDialog = remember {
         mutableStateOf(false)
     }
     Scaffold(
         topBar = {
-            SearchAppBar(onQueryChange = filterTaskByQuery)
+            SearchAppBar(onQueryChange = filterTaskByQuery, sortedTaskByParams = sortedTaskByParams)
         },
         floatingActionButton = {
             TodoFloatingActionButton(onShowDialog = { isShowAddTaskDialog.value = true })
@@ -58,7 +60,11 @@ fun TodoScreen(
 
 
 @Composable
-fun SearchAppBar(onQueryChange: (String) -> Unit, modifier: Modifier = Modifier) {
+fun SearchAppBar(
+    onQueryChange: (String) -> Unit,
+    sortedTaskByParams: (FilterParams) -> Unit,
+    modifier: Modifier = Modifier
+) {
     val query = remember { mutableStateOf("") }
     Column(
         modifier = modifier,
@@ -66,15 +72,15 @@ fun SearchAppBar(onQueryChange: (String) -> Unit, modifier: Modifier = Modifier)
         Surface(
             modifier = Modifier.fillMaxWidth(),
             color = MaterialTheme.colors.primary,
-            elevation = 8.dp
         ) {
             val onValueChange: (String) -> Unit = {
                 query.value = it
                 onQueryChange(it)
             }
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier,
                 verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
             ) {
                 TextField(
                     value = query.value,
@@ -102,12 +108,24 @@ fun SearchAppBar(onQueryChange: (String) -> Unit, modifier: Modifier = Modifier)
                     textStyle = TextStyle(color = MaterialTheme.colors.onSurface),
                     backgroundColor = MaterialTheme.colors.surface,
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth().padding(
-                        horizontal = 16.dp,
-                        vertical = 12.dp
-                    )
+                    modifier = Modifier.weight(8f)
+                        .padding(vertical = 8.dp, horizontal = 8.dp)
+                )
+                val itemsMenu: List<String> = listOf("Новые", "Старые")
+                PopUpMenu(
+                    "Сортировать по дате",
+                    //Если вы такое пишите, то, вероятнее всего, вы - черт
+                    menuItems = itemsMenu,
+                    onClickMenuItem = {
+                        when (it) {
+                            itemsMenu[0] -> sortedTaskByParams(FilterParams.Descending)
+                            itemsMenu[1] -> sortedTaskByParams(FilterParams.Ascending)
+                        }
+                    },
+                    modifier = Modifier.weight(1f).padding(end = 4.dp)
                 )
             }
+
         }
     }
 }
@@ -188,11 +206,4 @@ fun TaskFeed(
             }
         }
     }
-}
-
-
-@Preview
-@Composable
-fun PreviewTodoScreen() {
-    TodoScreen(emptyList(), {}, {}, {}, {})
 }

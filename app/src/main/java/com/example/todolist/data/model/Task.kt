@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 data class Task(val id: Int,
                 val name: String,
                 val description: String,
+                val createdDate: Long,
                 val status: StatusTask = StatusTask.InQueue)
 
 enum class StatusTask(val imageVector: ImageVector) {

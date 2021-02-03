@@ -1,14 +1,17 @@
 package com.example.todolist.ui.screens
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.todolist.data.model.Task
@@ -26,13 +29,15 @@ fun ChangeTaskDialog(
                 val task = Task(
                     0,
                     title,
-                    description
+                    description,
+                    System.currentTimeMillis()
                 )
                 onChangeTask(task)
-            }, onCancel = { onDismissDialog() }
+            }, onCancel = { onDismissDialog() },
+            titleTextField1 = "Название задачи",
+            titleTextField2 = "Описание задачи"
         )
     }
-
 }
 
 
@@ -137,4 +142,58 @@ fun FormWithTwoTextFields(
         },
         onCancel = onCancel
     )
+}
+
+@Composable
+fun PopUpMenu(
+    title: String,
+    menuItems: List<String>,
+    onClickMenuItem: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var isShowMenu by remember { mutableStateOf(false) }
+    Box(modifier = modifier) {
+        DropdownMenu(
+            toggle = { IconPopUpMenu(onClick = { isShowMenu = true }) },
+            expanded = isShowMenu,
+            onDismissRequest = { isShowMenu = false },
+        ) {
+            ItemPopUpMenu(
+                item = title,
+                isClickable = false,
+            )
+            menuItems.forEach {
+                ItemPopUpMenu(item = it, onClick = {
+                    onClickMenuItem(it)
+                    isShowMenu = false
+                })
+            }
+        }
+    }
+
+}
+
+@Composable
+fun ItemPopUpMenu(
+    item: String,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
+    isClickable: Boolean = true,
+) {
+    Text(
+        text = item,
+        modifier = modifier.fillMaxWidth().clickable(isClickable) { onClick() }
+            .padding(16.dp)
+
+    )
+}
+
+@Composable
+fun IconPopUpMenu(
+    icon: ImageVector = Icons.Default.MoreVert,
+    onClick: () -> Unit = {}
+) {
+    IconButton(onClick = onClick) {
+        Icon(imageVector = icon, contentDescription = "Menu")
+    }
 }

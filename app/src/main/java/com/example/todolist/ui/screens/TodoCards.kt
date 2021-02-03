@@ -171,7 +171,7 @@ fun TaskStatusRadioGroup(
 ) {
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.Center
+        horizontalArrangement = Arrangement.Start
     ) {
         for (status in StatusTask.values()) {
             val iconTint = if (currentStatus == status) Color.Blue else Color.Black

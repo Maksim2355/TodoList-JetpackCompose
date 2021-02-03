@@ -21,12 +21,13 @@ class TaskDbOpenHelper(context: Context) :
             val taskId = c.getInt(c.getColumnIndex(TASK_ID_COLUMN))
             val taskName = c.getString(c.getColumnIndex(TASK_NAME_COLUMN))
             val taskDescription = c.getString(c.getColumnIndex(TASK_DESCRIPTION_COLUMN))
+            val createdDate = c.getLong(c.getColumnIndex(TASK_CREATED_DATE_COLUMN))
             val taskStatus: StatusTask = when (c.getInt(c.getColumnIndex(TASK_STATUS_COLUMN))) {
                 0 -> StatusTask.InQueue
                 1 -> StatusTask.InProgress
                 else -> StatusTask.Completed
             }
-            listTask.add(Task(taskId, taskName, taskDescription, taskStatus))
+            listTask.add(Task(taskId, taskName, taskDescription, createdDate, taskStatus))
             c.moveToNext()
         }
         c.close()
@@ -56,6 +57,7 @@ class TaskDbOpenHelper(context: Context) :
                     "$TASK_ID_COLUMN integer primary key autoincrement," +
                     "$TASK_NAME_COLUMN text," +
                     "$TASK_DESCRIPTION_COLUMN text," +
+                    "$TASK_CREATED_DATE_COLUMN integer," +
                     "$TASK_STATUS_COLUMN integer);"
         )
     }
@@ -71,6 +73,7 @@ class TaskDbOpenHelper(context: Context) :
         private const val TASK_ID_COLUMN = "id"
         private const val TASK_NAME_COLUMN = "task_name"
         private const val TASK_DESCRIPTION_COLUMN = "task_description"
+        private const val TASK_CREATED_DATE_COLUMN = "created_date"
         private const val TASK_STATUS_COLUMN = "status"
         private const val STATUS_IN_QUEUE = 0
         private const val STATUS_IN_PROGRESS = 1
@@ -86,6 +89,7 @@ class TaskDbOpenHelper(context: Context) :
         return ContentValues().apply {
             put(TASK_NAME_COLUMN, task.name)
             put(TASK_DESCRIPTION_COLUMN, task.description)
+            put(TASK_CREATED_DATE_COLUMN, task.createdDate)
             put(TASK_STATUS_COLUMN, statusTask)
         }
     }
