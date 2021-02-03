@@ -18,9 +18,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val taskRepo = TaskRepositoryImpl(App.dao)
         val todoViewModel = ViewModelProvider(
             this,
-            TodoViewModelFactory(TaskRepositoryImpl(App.dao))
+            TodoViewModelFactory(
+                //После этих строк кода, в Украинском поезде начался сущный кошмар
+                taskRepo,
+                taskRepo
+            )
         ).get(TodoListViewModel::class.java)
         setContent {
             App {
@@ -29,7 +34,8 @@ class MainActivity : AppCompatActivity() {
                     taskList,
                     todoViewModel::addNewTask,
                     todoViewModel::removeTask,
-                    todoViewModel::updateTask
+                    todoViewModel::updateTask,
+                    todoViewModel::filterTaskByQuery
                 )
             }
         }

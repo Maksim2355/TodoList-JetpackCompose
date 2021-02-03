@@ -6,10 +6,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
@@ -22,13 +24,16 @@ fun TodoScreen(
     tasks: List<Task>,
     onAddTask: (Task) -> Unit,
     onRemoveTask: (Task) -> Unit,
-    onUpdateTask: (Task) -> Unit
+    onUpdateTask: (Task) -> Unit,
+    filterTaskByQuery: (String) -> Unit
 ) {
     val isShowAddTaskDialog = remember {
         mutableStateOf(false)
     }
     Scaffold(
-        topBar = { TodoAppBar() },
+        topBar = {
+            SearchAppBar(onQueryChange = filterTaskByQuery)
+        },
         floatingActionButton = {
             TodoFloatingActionButton(onShowDialog = { isShowAddTaskDialog.value = true })
         }
@@ -41,15 +46,53 @@ fun TodoScreen(
         if (isShowAddTaskDialog.value) {
             ChangeTaskDialog(
                 onChangeTask = onAddTask,
-                onDismissDialog = { isShowAddTaskDialog.value = false })
+                onDismissDialog = { isShowAddTaskDialog.value = false }
+            )
         }
     }
+
 }
 
 
 @Composable
-fun TodoAppBar(modifier: Modifier = Modifier) {
-    TopAppBar(title = { Text("Todo") }, modifier = modifier)
+fun SearchAppBar(onQueryChange: (String) -> Unit, modifier: Modifier = Modifier) {
+    val query = remember { mutableStateOf("") }
+    Column(
+        modifier = modifier,
+    ) {
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colors.primary,
+            elevation = 8.dp
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                TextField(
+                    value = query.value,
+                    onValueChange = {
+                        query.value = it
+                        println("Сработало")
+                        onQueryChange(it)
+                    },
+                    label = {
+                        Text("Search")
+                    },
+                    leadingIcon = {
+                        Icon(Icons.Default.Search, null)
+                    },
+                    textStyle = TextStyle(color = MaterialTheme.colors.onSurface),
+                    backgroundColor = MaterialTheme.colors.surface,
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth().padding(
+                        horizontal = 16.dp,
+                        vertical = 12.dp
+                    )
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -134,5 +177,5 @@ fun TaskFeed(
 @Preview
 @Composable
 fun PreviewTodoScreen() {
-    TodoScreen(emptyList(), {}, {}, {})
+    TodoScreen(emptyList(), {}, {}, {}, {})
 }
