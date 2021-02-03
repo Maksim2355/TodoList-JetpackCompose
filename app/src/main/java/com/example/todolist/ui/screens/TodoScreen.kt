@@ -2,6 +2,7 @@ package com.example.todolist.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -59,7 +60,7 @@ fun TodoFloatingActionButton(onShowDialog: () -> Unit, modifier: Modifier = Modi
         contentColor = Color.White,
         modifier = modifier
     ) {
-        Icon(imageVector = Icons.Filled.Add)
+        Icon(imageVector = Icons.Filled.Add, null)
     }
 }
 
@@ -109,7 +110,7 @@ fun TaskFeed(
     LazyColumn(
         modifier = modifier
     ) {
-        items(tasks) { task ->
+        items(items = tasks) { task ->
             if (task.id == currentPosition.value) {
                 TodoItemDetails(
                     task = task,

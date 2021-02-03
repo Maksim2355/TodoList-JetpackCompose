@@ -158,7 +158,7 @@ fun TodoRow(
             onClick = onIconClick,
             modifier = Modifier.weight(1f)
         ) {
-            Icon(imageVector = icon)
+            Icon(imageVector = icon, null)
         }
     }
 }
@@ -179,7 +179,7 @@ fun TaskStatusRadioGroup(
                 onClick = { onChangeStatus(status) },
                 modifier = Modifier.padding(vertical = 2.dp)
             ) {
-                Icon(imageVector = status.imageVector, tint = iconTint)
+                Icon(imageVector = status.imageVector,null,  tint = iconTint)
             }
         }
     }

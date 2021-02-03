@@ -46,7 +46,7 @@ fun TextFieldWithTitle(
     backgroundColor: Color = MaterialTheme.colors.background,
     validator: (String) -> Boolean = { true }
 ) {
-    val isErrorValue = remember { mutableStateOf(true) }
+    val isErrorValue = remember { mutableStateOf(false) }
     val valueTextField = remember { mutableStateOf(initValue) }
     if (title.isNotEmpty()) {
         Text(title, style = MaterialTheme.typography.body1)
@@ -57,9 +57,9 @@ fun TextFieldWithTitle(
             valueTextField.value = it
             if (validator(it)) {
                 onValueChange(it)
-                isErrorValue.value = true
-            } else {
                 isErrorValue.value = false
+            } else {
+                isErrorValue.value = true
             }
         },
         modifier = modifier,
@@ -130,8 +130,11 @@ fun FormWithTwoTextFields(
         validator = validator
     )
     FormControlButtons(
-        onSubmit = { onSubmit(title.value, description.value) },
+        onSubmit = {
+            if (validator(title.value) && validator(description.value)) {
+                onSubmit(title.value, description.value)
+            }
+        },
         onCancel = onCancel
     )
-
 }
