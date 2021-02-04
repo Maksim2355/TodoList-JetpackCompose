@@ -8,15 +8,14 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.todolist.common.validateDescription
+import com.example.todolist.common.validateTitle
 import com.example.todolist.data.model.StatusTask
 import com.example.todolist.data.model.Task
 
@@ -31,7 +30,10 @@ fun TodoItem(
         onClick = { changeCurrentPosition(task.id) },
         modifier = modifier
     ) {
-        TodoRow(title = task.name, icon = task.status.imageVector)
+        TextWithIconButtonRow(
+            title = task.name, icon = task.status.imageVector,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 
@@ -43,18 +45,16 @@ fun TodoItemDetails(
     onRemoveTask: (Task) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val isEditingMode = remember {
-        mutableStateOf(false)
-    }
+    var isEditingMode by remember { mutableStateOf(false) }
     TodoCard(
         onClick = {
-            if (isEditingMode.value) isEditingMode.value = false
+            if (isEditingMode) isEditingMode = false
             else changeCurrentPosition(null)
         },
-        onLongClick = { isEditingMode.value = !isEditingMode.value },
+        onLongClick = { isEditingMode = !isEditingMode },
         modifier = modifier
     ) {
-        if (isEditingMode.value) {
+        if (isEditingMode) {
             TodoItemEditor(
                 todoTitle = task.name,
                 todoDescription = task.description,
@@ -87,18 +87,17 @@ fun TodoItemEditor(
     onDescriptionChanged: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val validator: (String) -> Boolean = { it.length > 4 }
     TextFieldWithTitle(
         initValue = todoTitle,
         onValueChange = { onTitleChanged(it) },
         modifier = modifier.padding(6.dp),
-        validator = validator
+        validator = validateTitle
     )
     TextFieldWithTitle(
         initValue = todoDescription,
         onValueChange = { onDescriptionChanged(it) },
         modifier = modifier.padding(6.dp),
-        validator = validator,
+        validator = validateDescription,
     )
 }
 
@@ -110,7 +109,7 @@ fun TodoDetails(
     onIconClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    TodoRow(
+    TextWithIconButtonRow(
         title = title,
         icon = icon,
         onIconClick = { onIconClick() },
@@ -140,8 +139,9 @@ fun TodoCard(
 }
 
 @Composable
-fun TodoRow(
-    title: String, icon: ImageVector, modifier: Modifier = Modifier,
+fun TextWithIconButtonRow(
+    title: String, icon: ImageVector,
+    modifier: Modifier = Modifier,
     onIconClick: () -> Unit = {}
 ) {
     Row(
@@ -151,7 +151,6 @@ fun TodoRow(
     ) {
         Text(
             text = title,
-            fontWeight = FontWeight.Bold,
             modifier = Modifier.weight(6f)
         )
         IconButton(
@@ -179,7 +178,7 @@ fun TaskStatusRadioGroup(
                 onClick = { onChangeStatus(status) },
                 modifier = Modifier.padding(vertical = 2.dp)
             ) {
-                Icon(imageVector = status.imageVector,null,  tint = iconTint)
+                Icon(imageVector = status.imageVector, null, tint = iconTint)
             }
         }
     }
