@@ -2,10 +2,7 @@ package com.example.todolist.ui.screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Card
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
@@ -13,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.todolist.common.validateDescription
 import com.example.todolist.common.validateTitle
@@ -151,7 +149,9 @@ fun TextWithIconButtonRow(
     ) {
         Text(
             text = title,
-            modifier = Modifier.weight(6f)
+            modifier = Modifier.weight(6f),
+            style = MaterialTheme.typography.body1,
+            fontWeight = FontWeight.Bold
         )
         IconButton(
             onClick = onIconClick,

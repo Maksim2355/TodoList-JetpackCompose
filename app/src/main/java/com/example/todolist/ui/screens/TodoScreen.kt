@@ -3,6 +3,7 @@ package com.example.todolist.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -17,11 +18,14 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import com.example.todolist.common.FilterParams
 import com.example.todolist.data.model.Task
+import com.example.todolist.ui.purple200
+import com.example.todolist.ui.purple500
 
 
 @Composable
@@ -38,79 +42,18 @@ fun TodoScreen(
     }
     Scaffold(
         topBar = {
-            SearchAppBar(onQueryChange = filterTaskByQuery, sortedTaskByParams = sortedTaskByParams)
+            SearchAppBar(onQueryChange = filterTaskByQuery)
         },
         floatingActionButton = {
             TodoFloatingActionButton(onShowDialog = { isShowAddTaskDialog.value = true })
-        }
-    ) {
-        BodyContent(
-            tasks,
-            onRemoveTask,
-            onUpdateTask,
-        )
-        if (isShowAddTaskDialog.value) {
-            ChangeTaskDialog(
-                onChangeTask = onAddTask,
-                onDismissDialog = { isShowAddTaskDialog.value = false }
-            )
-        }
-    }
-}
-
-
-@Composable
-fun SearchAppBar(
-    onQueryChange: (String) -> Unit,
-    sortedTaskByParams: (FilterParams) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val query = remember { mutableStateOf("") }
-    Column(
-        modifier = modifier,
-    ) {
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            color = MaterialTheme.colors.primary,
-        ) {
-            val onValueChange: (String) -> Unit = {
-                query.value = it
-                onQueryChange(it)
-            }
-            Row(
-                modifier = Modifier,
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start
+        },
+        floatingActionButtonPosition = FabPosition.Center,
+        isFloatingActionButtonDocked = true,
+        bottomBar = {
+            BottomAppBar(
+                cutoutShape = RoundedCornerShape(50),
+                backgroundColor = purple500,
             ) {
-                TextField(
-                    value = query.value,
-                    onValueChange = onValueChange,
-                    label = {
-                        Text("Search")
-                    },
-                    leadingIcon = {
-                        Icon(Icons.Default.Search, null)
-                    },
-                    trailingIcon = {
-                        IconButton(onClick = { onValueChange("") }) {
-                            Icon(Icons.Default.Clear, null)
-                        }
-                    },
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Done,
-                    ),
-                    onImeActionPerformed = { imeAction, softwareKeyboardController ->
-                        if (imeAction == ImeAction.Done) {
-                            softwareKeyboardController?.hideSoftwareKeyboard()
-                        }
-                    },
-                    textStyle = TextStyle(color = MaterialTheme.colors.onSurface),
-                    backgroundColor = MaterialTheme.colors.surface,
-                    singleLine = true,
-                    modifier = Modifier.weight(8f)
-                        .padding(vertical = 8.dp, horizontal = 8.dp)
-                )
                 val itemsMenu: List<String> = listOf("Новые", "Старые")
                 PopUpMenu(
                     "Сортировать по дате",
@@ -125,10 +68,23 @@ fun SearchAppBar(
                     modifier = Modifier.weight(1f).padding(end = 4.dp)
                 )
             }
-
+        }
+    ) {
+        BodyContent(
+            tasks,
+            onRemoveTask,
+            onUpdateTask,
+            modifier = Modifier.padding(it)
+        )
+        if (isShowAddTaskDialog.value) {
+            ChangeTaskDialog(
+                onChangeTask = onAddTask,
+                onDismissDialog = { isShowAddTaskDialog.value = false }
+            )
         }
     }
 }
+
 
 @Composable
 fun TodoFloatingActionButton(onShowDialog: () -> Unit, modifier: Modifier = Modifier) {
@@ -147,14 +103,15 @@ fun BodyContent(
     tasks: List<Task>,
     onRemoveTask: (Task) -> Unit,
     onUpdateTask: (Task) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     if (tasks.isEmpty()) {
         NoDataMessage(
             "No data",
-            modifier = Modifier
+            modifier = modifier
         )
     } else {
-        TaskFeed(tasks, onUpdateTask, onRemoveTask)
+        TaskFeed(tasks, onUpdateTask, onRemoveTask, modifier = modifier)
     }
 }
 
