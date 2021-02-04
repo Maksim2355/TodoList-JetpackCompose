@@ -20,4 +20,6 @@
 Так, если у вас есть хорошая статья как работать с фокусом или с инсетами, то, пожалуйста, дайте обратную связь. Контакты у меня в профиле
 P.s я знаю о https://chrisbanes.github.io/accompanist/insets/
 
-![Screen1](./Screenshot/scr1.jpg) ![Screen2](./Screenshot/scr2.jpg) ![Screen3](./Screenshot/scr3.jpg)
+![Screen3](./Screenshot/scr3.jpg)
+![Screen2](./Screenshot/scr2.jpg) 
+![Screen1](./Screenshot/scr1.jpg)
